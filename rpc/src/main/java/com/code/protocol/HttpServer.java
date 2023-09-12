@@ -1,6 +1,7 @@
 package com.code.protocol;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Server;
@@ -18,13 +19,12 @@ public class HttpServer {
         Tomcat tomcat = new Tomcat();
 
         Server server = tomcat.getServer();
-
         Service service = server.findService("Tomcat");
 
         Connector connector = new Connector();
         connector.setPort(port);
 
-        StandardEngine engine = new StandardEngine();
+        Engine engine = new StandardEngine();
         engine.setDefaultHost(hostname);
 
         Host host = new StandardHost();
@@ -33,7 +33,7 @@ public class HttpServer {
         String contextPath = "";
         Context context = new StandardContext();
         context.setPath(contextPath);
-        connector.addLifecycleListener(new Tomcat.FixContextListener());
+        context.addLifecycleListener(new Tomcat.FixContextListener());
 
         host.addChild(context);
         engine.addChild(host);
@@ -49,6 +49,7 @@ public class HttpServer {
             tomcat.start();
             tomcat.getServer().await();
         } catch (LifecycleException e) {
+            System.out.println(11);
             e.printStackTrace();
         }
     }
