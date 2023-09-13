@@ -9,6 +9,7 @@ import com.code.register.MapRemoteRegister;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProxyFactory {
@@ -27,16 +28,27 @@ public class ProxyFactory {
                 // 服务发现
                 List<URL> list = MapRemoteRegister.get(interfaceClass.getName());
 
-                // 负载均衡
-                URL url = Loadbalance.random(list);
-
                 // 服务调用
                 String result = null;
-                try {
-                    result = httpClient.send(url.getHostname(), url.getPort(), invocation);
-                } catch (Exception e) {
-                    // 容错
-                    return "服务调用异常";
+
+                List<URL> invokedUrls = new ArrayList<>();
+
+                int max = 3;
+                while (max > 0) {
+
+                    // 负载均衡
+                    list.remove(invokedUrls);
+                    URL url = Loadbalance.random(list);
+                    invokedUrls.add(url);
+
+                    try {
+                        result = httpClient.send(url.getHostname(), url.getPort(), invocation);
+                    } catch (Exception e) {
+                        if (max-- != 0) continue;
+                        // 容错
+                        // error-callback = com.code.HelloServiceErrorCallback
+                        return "服务调用异常";
+                    }
                 }
 
                 return result;
