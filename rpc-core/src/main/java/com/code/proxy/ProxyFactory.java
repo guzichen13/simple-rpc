@@ -2,6 +2,7 @@ package com.code.proxy;
 
 import com.code.common.Invocation;
 import com.code.common.URL;
+import com.code.loadbalance.Loadbalance;
 import com.code.protocol.HttpClient;
 import com.code.register.MapRemoteRegister;
 
@@ -27,8 +28,10 @@ public class ProxyFactory {
                 List<URL> list = MapRemoteRegister.get(interfaceClass.getName());
 
                 // 负载均衡
+                URL url = Loadbalance.random(list);
 
-                String result = httpClient.send("localhost", 8080, invocation);
+                // 服务调用
+                String result = httpClient.send(url.getHostname(), url.getPort(), invocation);
 
                 return result;
             }
