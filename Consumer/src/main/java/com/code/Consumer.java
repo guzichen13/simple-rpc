@@ -7,7 +7,7 @@ import com.code.proxy.ProxyFactory;
 public class Consumer {
     public static void main(String[] args) {
          HelloService helloService = ProxyFactory.getProxy(HelloService.class);
-         String result = helloService.sayHello("张三123321");
+         String result = helloService.sayHello("张三");
          System.out.println(result);
 
         // // 构建invocation对象

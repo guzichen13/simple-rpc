@@ -1,11 +1,14 @@
 package com.code.proxy;
 
 import com.code.common.Invocation;
+import com.code.common.URL;
 import com.code.protocol.HttpClient;
+import com.code.register.MapRemoteRegister;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 public class ProxyFactory {
     public static<T> T getProxy(Class interfaceClass) {
@@ -19,6 +22,12 @@ public class ProxyFactory {
 
                 // 发送网络请求
                 HttpClient httpClient = new HttpClient();
+
+                // 服务发现
+                List<URL> list = MapRemoteRegister.get(interfaceClass.getName());
+
+                // 负载均衡
+
                 String result = httpClient.send("localhost", 8080, invocation);
 
                 return result;
